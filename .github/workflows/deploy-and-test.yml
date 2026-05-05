@@ -31,6 +31,7 @@ jobs:
         env:
           TOFU_STATE_BUCKET: ${{ secrets.TOFU_STATE_BUCKET }}
         run: |
+          printf '%s\n' 'terraform {' '  backend "s3" {}' '}' > backend.github.tf
           tofu init \
             -backend-config="bucket=$TOFU_STATE_BUCKET" \
             -backend-config="key=banking-transaction-processor/terraform.tfstate" \
