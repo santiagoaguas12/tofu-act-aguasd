@@ -99,6 +99,14 @@ tofu output bucket_name
 tofu output state_machine_arn
 ```
 
+## Safe GitHub Actions Workflow
+
+This repository includes a safe manual GitHub Actions workflow named `OpenTofu Manual CI`. After pushing the project to GitHub, open the Actions tab, select the workflow, and use `Run workflow` to execute it.
+
+The workflow only checks OpenTofu formatting, initializes OpenTofu without a backend using `tofu init -backend=false`, validates the configuration with `tofu validate`, and lists the files inside `tests/`. It does not use AWS credentials, GitHub Secrets, AWS CLI commands, `tofu apply`, or `tofu destroy`.
+
+Real deployment is done locally from the student's terminal after configuring AWS CLI on their own computer.
+
 ## Test With AWS CLI
 
 Replace `<ARN>` with the `state_machine_arn` output:
