@@ -99,13 +99,23 @@ tofu output bucket_name
 tofu output state_machine_arn
 ```
 
-## Safe GitHub Actions Workflow
+## GitHub Actions CI/CD
 
-This repository includes a safe manual GitHub Actions workflow named `OpenTofu Manual CI`. After pushing the project to GitHub, open the Actions tab, select the workflow, and use `Run workflow` to execute it.
+This project includes two manual GitHub Actions workflows that can be executed from the Actions tab with `Run workflow`.
 
-The workflow only checks OpenTofu formatting, initializes OpenTofu without a backend using `tofu init -backend=false`, validates the configuration with `tofu validate`, and lists the files inside `tests/`. It does not use AWS credentials, GitHub Secrets, AWS CLI commands, `tofu apply`, or `tofu destroy`.
+- `Deploy and Test OpenTofu Pipeline`: deploys the infrastructure with OpenTofu, reads the generated outputs, starts the Step Function with the JSON files in `tests/`, waits briefly, and verifies the generated S3 objects.
+- `Destroy OpenTofu Resources`: destroys the AWS resources created by OpenTofu. Run this workflow manually after the review or tests to avoid charges.
 
-Real deployment is done locally from the student's terminal after configuring AWS CLI on their own computer.
+AWS credentials are not stored in the code and must be configured manually in GitHub as Repository Secrets:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_SESSION_TOKEN`
+- `AWS_REGION`
+
+`AWS_SESSION_TOKEN` is required when using temporary credentials such as AWS Academy credentials. Do not commit credentials, `.env` files, `.tfvars` files with secrets, or local OpenTofu/Terraform state files.
+
+Important: this project ignores local OpenTofu/Terraform state files. For the destroy workflow to remove resources created by a previous GitHub Actions run, OpenTofu must be able to access the same state, usually through a remote backend configured separately. Do not upload local state files to GitHub.
 
 ## Test With AWS CLI
 
