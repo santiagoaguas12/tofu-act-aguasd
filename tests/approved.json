@@ -1,0 +1,7 @@
+{
+  "transaction_id": "tx-1001",
+  "account": "1234-5678",
+  "amount": 250.75,
+  "country": "MX",
+  "merchant": "Local Market"
+}
