@@ -46,19 +46,53 @@ A transaction is valid only when `amount` is numeric and greater than zero, `cou
     └── invalid.json
 ```
 
-## Deploy
+## Run After Cloning
 
-Run these commands from the project root:
+Clone the repository and enter the project directory:
+
+```bash
+git clone <YOUR_GITHUB_REPO_URL>
+cd Act-tofu
+```
+
+Make sure you have these tools installed locally:
+
+- Git
+- OpenTofu `>= 1.6.0`
+- AWS CLI
+- Python 3.12
+
+Configure AWS credentials on your machine before deploying. For example, if you use AWS CLI profiles:
+
+```bash
+aws configure
+aws sts get-caller-identity
+```
+
+Initialize the project and validate the infrastructure:
 
 ```bash
 tofu init
 tofu fmt
 tofu validate
+```
+
+Review the execution plan and deploy the stack:
+
+```bash
 tofu plan
 tofu apply
 ```
 
-Useful outputs are available after deployment:
+If you want to use a different AWS region or a different resource prefix, you can override the defaults:
+
+```bash
+tofu plan -var="aws_region=us-east-1" -var="project_name=banking-transaction-processor"
+```
+
+## Useful Outputs
+
+After deployment, you can inspect the most useful outputs with:
 
 ```bash
 tofu output bucket_name
