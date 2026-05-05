@@ -25,7 +25,13 @@ jobs:
           tofu_version: latest
 
       - name: Initialize OpenTofu
-        run: tofu init
+        env:
+          TOFU_STATE_BUCKET: ${{ secrets.TOFU_STATE_BUCKET }}
+        run: |
+          tofu init \
+            -backend-config="bucket=$TOFU_STATE_BUCKET" \
+            -backend-config="key=banking-transaction-processor/terraform.tfstate" \
+            -backend-config="region=us-east-1"
 
       - name: Destroy OpenTofu resources
         run: tofu destroy -auto-approve

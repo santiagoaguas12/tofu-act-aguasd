@@ -110,10 +110,11 @@ AWS credentials are not stored in the code and must be configured manually in Gi
 
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
+- `TOFU_STATE_BUCKET`
 
-The workflows use the project's default AWS region, `us-east-1`. Do not commit credentials, `.env` files, `.tfvars` files with secrets, or local OpenTofu/Terraform state files.
+The workflows use the project's default AWS region, `us-east-1`. The `TOFU_STATE_BUCKET` secret must contain the name of an existing S3 bucket used only for OpenTofu remote state. Create this bucket manually before running the deploy workflow, and do not use the same bucket that the project creates for transaction results.
 
-Important: this project ignores local OpenTofu/Terraform state files. For the destroy workflow to remove resources created by a previous GitHub Actions run, OpenTofu must be able to access the same state, usually through a remote backend configured separately. Do not upload local state files to GitHub.
+The deploy and destroy workflows both initialize OpenTofu with the same remote state key: `banking-transaction-processor/terraform.tfstate`. This lets the destroy workflow find the resources created by the deploy workflow. Do not commit credentials, `.env` files, `.tfvars` files with secrets, or local OpenTofu/Terraform state files.
 
 ## Test With AWS CLI
 
