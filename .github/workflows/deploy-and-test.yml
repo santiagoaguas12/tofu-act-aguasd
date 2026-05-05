@@ -1,0 +1,67 @@
+name: Deploy and Test OpenTofu Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-and-test:
+    name: Deploy and test pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: latest
+
+      - name: Check OpenTofu formatting
+        run: tofu fmt -check -recursive
+
+      - name: Initialize OpenTofu
+        run: tofu init
+
+      - name: Validate OpenTofu configuration
+        run: tofu validate
+
+      - name: Apply OpenTofu configuration
+        run: tofu apply -auto-approve
+
+      - name: Read OpenTofu outputs
+        id: outputs
+        run: |
+          echo "state_machine_arn=$(tofu output -raw state_machine_arn)" >> "$GITHUB_OUTPUT"
+          echo "bucket_name=$(tofu output -raw bucket_name)" >> "$GITHUB_OUTPUT"
+
+      - name: Run Step Function test cases
+        run: |
+          aws stepfunctions start-execution \
+            --state-machine-arn "${{ steps.outputs.outputs.state_machine_arn }}" \
+            --input file://tests/approved.json
+
+          aws stepfunctions start-execution \
+            --state-machine-arn "${{ steps.outputs.outputs.state_machine_arn }}" \
+            --input file://tests/review_amount.json
+
+          aws stepfunctions start-execution \
+            --state-machine-arn "${{ steps.outputs.outputs.state_machine_arn }}" \
+            --input file://tests/review_country.json
+
+          aws stepfunctions start-execution \
+            --state-machine-arn "${{ steps.outputs.outputs.state_machine_arn }}" \
+            --input file://tests/invalid.json
+
+      - name: Wait for executions
+        run: sleep 15
+
+      - name: Verify S3 results
+        run: aws s3 ls "s3://${{ steps.outputs.outputs.bucket_name }}" --recursive

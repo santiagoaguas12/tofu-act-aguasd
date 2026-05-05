@@ -110,10 +110,8 @@ AWS credentials are not stored in the code and must be configured manually in Gi
 
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
-- `AWS_SESSION_TOKEN`
-- `AWS_REGION`
 
-`AWS_SESSION_TOKEN` is required when using temporary credentials such as AWS Academy credentials. Do not commit credentials, `.env` files, `.tfvars` files with secrets, or local OpenTofu/Terraform state files.
+The workflows use the project's default AWS region, `us-east-1`. Do not commit credentials, `.env` files, `.tfvars` files with secrets, or local OpenTofu/Terraform state files.
 
 Important: this project ignores local OpenTofu/Terraform state files. For the destroy workflow to remove resources created by a previous GitHub Actions run, OpenTofu must be able to access the same state, usually through a remote backend configured separately. Do not upload local state files to GitHub.
 
